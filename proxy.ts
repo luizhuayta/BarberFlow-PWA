@@ -6,44 +6,46 @@ export async function proxy(request: NextRequest) {
     request,
   })
 
-  // Guard: si no hay credenciales de Supabase (ej. en tests E2E sin .env), saltamos auth
   const hasSupabaseEnv =
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  let user = null
-
-  if (hasSupabaseEnv) {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value)
-            )
-            supabaseResponse = NextResponse.next({
-              request,
-            })
-            cookiesToSet.forEach(({ name, value, options }) =>
-              supabaseResponse.cookies.set(name, value, options)
-            )
-          },
-        },
-      }
-    )
-
-    // IMPORTANT: Avoid writing any logic between createServerClient and
-    // supabase.auth.getUser().
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser()
-
-    user = authUser
+  // =====================================================
+  // MODO HÍBRIDO (Prisma local): No hay Supabase configurado
+  // → No aplicamos protección de rutas para poder desarrollar
+  // =====================================================
+  if (!hasSupabaseEnv) {
+    return supabaseResponse
   }
+
+  // =====================================================
+  // MODO SUPABASE (Producción o con credenciales)
+  // =====================================================
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          )
+          supabaseResponse = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
 
@@ -62,11 +64,18 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith(route)
   )
 
-  // Si intenta acceder a ruta protegida sin estar logueado → login
+  // Redirigir a login si no hay usuario autenticado
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('redirectedFrom', pathname)
+    return NextResponse.redirect(url)
+  }
+
+  // Si ya está logueado y va a login → redirigir al dashboard
+  if (user && (pathname === '/login' || pathname === '/signup')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
 
