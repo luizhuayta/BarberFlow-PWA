@@ -5,6 +5,8 @@ import { ClientSearch } from '@/components/features/clients/ClientSearch'
 import { ClientCard } from '@/components/features/clients/ClientCard'
 import { ClientForm, type ClientFormData } from '@/components/features/clients/ClientForm'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { CardSkeleton } from '@/components/ui/CardSkeleton'
 import { toast } from 'sonner'
 
 interface Client {
@@ -101,7 +103,6 @@ export default function ClientesPage() {
         const client = await res.json()
         setSelectedClient(client)
 
-        // Load appointment history
         const historyRes = await fetch(`/api/clients/${id}/history`)
         if (historyRes.ok) {
           const historyData = await historyRes.json()
@@ -119,8 +120,8 @@ export default function ClientesPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-4">
+    <div className="max-w-4xl mx-auto pb-20 md:pb-8">
+      <div className="mb-2 px-1">
         <h1 className="text-3xl font-semibold tracking-tight">Clientes</h1>
         <p className="text-white/60 text-sm">Búsqueda rápida y gestión</p>
       </div>
@@ -131,16 +132,24 @@ export default function ClientesPage() {
       />
 
       {isLoading ? (
-        <div className="text-center py-10 text-white/60">Buscando...</div>
-      ) : clients.length === 0 ? (
-        <div className="text-center py-16 border border-white/10 rounded-2xl">
-          <p className="text-white/60">No se encontraron clientes</p>
-          <Button onClick={openCreateForm} className="mt-4" variant="outline">
-            Crear nuevo cliente
-          </Button>
+        <div className="grid gap-3 mt-2">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 animate-pulse h-[92px]" />
+          ))}
         </div>
+      ) : clients.length === 0 ? (
+        <EmptyState
+          icon="👥"
+          title="No se encontraron clientes"
+          description="Prueba con otro nombre o crea un nuevo cliente."
+          action={
+            <Button onClick={openCreateForm} className="bg-amber-400 hover:bg-amber-500 text-black">
+              Crear nuevo cliente
+            </Button>
+          }
+        />
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-3 mt-2">
           {clients.map((client) => (
             <ClientCard 
               key={client.id} 
@@ -151,7 +160,15 @@ export default function ClientesPage() {
         </div>
       )}
 
-      {/* Client Detail Modal */}
+      {/* Floating Action Button */}
+      <button
+        onClick={openCreateForm}
+        className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-amber-400 text-black rounded-full shadow-xl flex items-center justify-center text-3xl active:scale-95 transition"
+      >
+        +
+      </button>
+
+      {/* Client Detail */}
       {selectedClient && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-end md:items-center justify-center">
           <div className="w-full md:max-w-lg bg-[#111] rounded-t-3xl md:rounded-2xl p-6 border border-white/10 max-h-[90vh] overflow-auto">
@@ -193,14 +210,14 @@ export default function ClientesPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-white/50 text-sm">Sin citas registradas aún.</p>
+                <p className="text-white/50 text-sm">Sin citas registradas.</p>
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Create/Edit Form Modal */}
+      {/* Form Modal */}
       {isFormOpen && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end md:items-center justify-center p-4">
           <div className="w-full md:max-w-md bg-[#111] rounded-3xl p-6 border border-white/10">

@@ -5,6 +5,8 @@ import { BarberCard } from '@/components/features/barbers/BarberCard'
 import { BarberForm, type BarberFormData } from '@/components/features/barbers/BarberForm'
 import { BarberModal } from '@/components/features/barbers/BarberModal'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { CardSkeleton } from '@/components/ui/CardSkeleton'
 import { toast } from 'sonner'
 
 interface Barber {
@@ -66,7 +68,7 @@ export default function BarberosPage() {
         body: JSON.stringify(data),
       })
 
-      if (!res.ok) throw new Error('Error')
+      if (!res.ok) throw new Error()
 
       toast.success(editingBarber ? 'Barbero actualizado' : 'Barbero creado')
       closeModal()
@@ -91,26 +93,37 @@ export default function BarberosPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="max-w-5xl mx-auto pb-20 md:pb-8">
+      <div className="flex items-center justify-between mb-6 px-1">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Barberos</h1>
-          <p className="text-white/60 text-sm mt-1">Gestiona al equipo de la barbería</p>
+          <p className="text-white/60 text-sm mt-1">Gestiona a tu equipo</p>
         </div>
-        <Button onClick={openCreateModal} className="bg-amber-400 hover:bg-amber-500 text-black font-medium">
+        <Button 
+          onClick={openCreateModal} 
+          className="hidden md:flex bg-amber-400 hover:bg-amber-500 text-black font-medium"
+        >
           + Nuevo barbero
         </Button>
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12 text-white/60">Cargando barberos...</div>
-      ) : barbers.length === 0 ? (
-        <div className="text-center py-16 border border-white/10 rounded-2xl">
-          <p className="text-white/60 mb-4">Aún no tienes barberos registrados</p>
-          <Button onClick={openCreateModal} variant="outline" className="border-white/20">
-            Agregar primer barbero
-          </Button>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
         </div>
+      ) : barbers.length === 0 ? (
+        <EmptyState
+          icon="👤"
+          title="No tienes barberos registrados"
+          description="Agrega a los miembros de tu equipo para poder asignarles citas."
+          action={
+            <Button onClick={openCreateModal} className="bg-amber-400 hover:bg-amber-500 text-black">
+              Agregar primer barbero
+            </Button>
+          }
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {barbers.map((barber) => (
@@ -123,6 +136,14 @@ export default function BarberosPage() {
           ))}
         </div>
       )}
+
+      {/* Floating Action Button */}
+      <button
+        onClick={openCreateModal}
+        className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-amber-400 text-black rounded-full shadow-xl flex items-center justify-center text-3xl active:scale-95 transition"
+      >
+        +
+      </button>
 
       <BarberModal
         isOpen={isModalOpen}
