@@ -1,5 +1,18 @@
-# Docker Compose - Producción
-# Uso: docker compose -f docker-compose.prod.yml up --build -d
+# =====================================================
+# Docker Compose - PRODUCCIÓN (con Supabase Cloud)
+# =====================================================
+#
+# Este compose SOLO levanta la aplicación Next.js.
+# La base de datos es Supabase Cloud (no Postgres local en Docker).
+#
+# Uso:
+#   docker compose -f docker-compose.prod.yml up --build -d
+#
+# NOTA IMPORTANTE:
+# - En producción real (VPS, Railway, Fly.io, etc.) es mejor pasar
+#   las variables de entorno de forma segura (secrets / env vars de la plataforma),
+#   no depender solo de .env.local.
+# =====================================================
 
 version: '3.8'
 
@@ -18,15 +31,17 @@ services:
       - PORT=3000
       - HOSTNAME=0.0.0.0
     restart: unless-stopped
+
+    # Opcional: Healthcheck (descomentar cuando tengas endpoint /api/health)
     # healthcheck:
     #   test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
     #   interval: 30s
     #   timeout: 10s
     #   retries: 3
     #   start_period: 10s
-    # networks:
-    #   - barberflow-net
 
-# networks:
-#   barberflow-net:
-#     driver: bridge
+# =====================================================
+# Si en el futuro quieres Supabase self-hosted (Postgres local),
+# aquí podrías agregar un servicio 'db' con la imagen de Supabase.
+# Por ahora usamos Supabase Cloud → NO se necesita Postgres en Docker.
+# =====================================================

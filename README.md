@@ -112,9 +112,23 @@ docker run -p 3000:3000 barberflow:latest
 
    Ya no necesitas pasar las variables manualmente.
 
-### Supabase local (futuro)
+### Producción con Supabase Cloud (Recomendado)
 
-Cuando configures Supabase self-hosted, se podrá agregar un servicio `supabase-db` al `docker-compose.yml`. Por ahora se recomienda usar Supabase Cloud.
+En producción **NO** levantamos PostgreSQL en Docker.
+
+- La aplicación Next.js corre en Docker (o en plataformas como Railway, Fly.io, VPS, etc.).
+- La base de datos y autenticación viven en **Supabase Cloud**.
+- Esto es más simple, escalable y seguro para empezar.
+
+En `docker-compose.prod.yml` ya está configurado para conectarse a Supabase Cloud usando las variables de `.env.local`.
+
+**Recomendación para deploy real:**
+- Usa variables de entorno de la plataforma (no subas `.env.local`).
+- Ejemplos: Railway, Render, Fly.io, DigitalOcean App Platform, VPS con Docker.
+
+### Supabase Self-Hosted (Futuro - Opcional)
+
+Si más adelante quieres tener todo en Docker (Supabase + tu app), podemos agregar los servicios oficiales de Supabase (Postgres + Auth + Storage) al compose. Por ahora se recomienda **Supabase Cloud**.
 
 ## 📦 Scripts (Docker)
 

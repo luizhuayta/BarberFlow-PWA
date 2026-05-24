@@ -105,3 +105,25 @@ SELECT * FROM public.profiles WHERE id = auth.uid();
 --
 -- NOTA: Más adelante (Sprint 2+) moveremos la asignación de roles a una UI de admin.
 -- ============================================================
+
+-- ============================================================
+-- PRODUCCIÓN CON SUPABASE CLOUD (Recomendado)
+-- ============================================================
+--
+-- Para producción NO uses Postgres dentro de Docker.
+--
+-- Recomendación actual:
+--   - App Next.js → Docker (o plataforma como Railway/Fly.io)
+--   - Base de datos + Auth → Supabase Cloud (gratis hasta cierto uso)
+--
+-- Ventajas:
+--   - Más fácil de mantener
+--   - Backups automáticos
+--   - Auth + Storage ya incluidos
+--   - Row Level Security potente
+--
+-- Si en el futuro quieres todo 100% self-hosted, podemos agregar
+-- los contenedores oficiales de Supabase al docker-compose.prod.yml.
+--
+-- Por ahora: Supabase Cloud + tu app en Docker = Mejor opción para empezar.
+-- ============================================================
