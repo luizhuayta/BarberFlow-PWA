@@ -39,3 +39,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Docker / Standalone build artifacts
+.next/standalone/
+
+# Temporary scripts
+/scripts/
+
+# Misc
+.DS_Store
+*.log
+.env.local
+.env.*.local
