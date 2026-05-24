@@ -10,13 +10,12 @@ services:
     working_dir: /app
     ports:
       - "3000:3000"
+    env_file:
+      - .env.local
     environment:
       - NODE_ENV=development
       - PORT=3000
       - HOSTNAME=0.0.0.0
-      # Agregar aquí variables de Supabase cuando se configure:
-      # - NEXT_PUBLIC_SUPABASE_URL=...
-      # - NEXT_PUBLIC_SUPABASE_ANON_KEY=...
     volumes:
       - .:/app
       - /app/node_modules

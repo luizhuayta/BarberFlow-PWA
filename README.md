@@ -93,14 +93,28 @@ npm run docker:build
 docker run -p 3000:3000 barberflow:latest
 ```
 
-### Variables de entorno
+### Variables de entorno (Importante para Docker)
 
-Copia `.env.example` (cuando exista) a `.env.local` para desarrollo.
-Para producción, pasa variables al contenedor vía `environment` en `docker-compose.prod.yml` o con `--env-file`.
+1. Copia el archivo de ejemplo:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. Completa tus credenciales de Supabase en `.env.local`:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...
+   ```
+
+3. **Docker ahora lee automáticamente** el archivo `.env.local`:
+   - `docker compose up` (desarrollo)
+   - `docker compose -f docker-compose.prod.yml up` (producción)
+
+   Ya no necesitas pasar las variables manualmente.
 
 ### Supabase local (futuro)
 
-Cuando se configure Supabase self-hosted, se agregará servicio `supabase-db` y `supabase-studio` al compose de dev.
+Cuando configures Supabase self-hosted, se podrá agregar un servicio `supabase-db` al `docker-compose.yml`. Por ahora se recomienda usar Supabase Cloud.
 
 ## 📦 Scripts (Docker)
 
