@@ -1,0 +1,64 @@
+// BarberFlow - Prisma Schema
+// Base de datos PostgreSQL local (dentro de Docker)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      String   @default("barbero") // "dueño" | "barbero"
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones futuras
+  // appointmentsAsBarber Appointment[] @relation("BarberAppointments")
+  // appointmentsAsClient Appointment[] @relation("ClientAppointments")
+}
+
+model Service {
+  id               String   @id @default(cuid())
+  name             String
+  durationMinutes  Int
+  price            Decimal
+  description      String?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+}
+
+model Appointment {
+  id        String   @id @default(cuid())
+  clientId  String
+  barberId  String
+  serviceId String
+  startTime DateTime
+  endTime   DateTime
+  status    String   @default("pending") // pending, confirmed, completed, cancelled
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones (cuando se definan los modelos completos)
+  // client  User @relation("ClientAppointments", fields: [clientId], references: [id])
+  // barber  User @relation("BarberAppointments", fields: [barberId], references: [id])
+  // service Service @relation(fields: [serviceId], references: [id])
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  email     String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

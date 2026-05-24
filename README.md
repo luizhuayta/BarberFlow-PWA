@@ -126,9 +126,36 @@ En `docker-compose.prod.yml` ya está configurado para conectarse a Supabase Clo
 - Usa variables de entorno de la plataforma (no subas `.env.local`).
 - Ejemplos: Railway, Render, Fly.io, DigitalOcean App Platform, VPS con Docker.
 
+### Desarrollo Híbrido (Recomendado actualmente)
+
+Esta es la forma más cómoda de trabajar mientras desarrollas:
+
+- **Next.js** → Corre localmente con `npm run dev` (rápido y cómodo)
+- **Base de datos** → Corre dentro de Docker (PostgreSQL)
+
+#### Comandos para usar este modo:
+
+```bash
+# 1. Levantar solo la base de datos
+npm run db:up
+
+# 2. (Primera vez) Aplicar el schema de la base de datos
+npx prisma migrate dev
+
+# 3. Correr la aplicación normalmente
+npm run dev
+```
+
+Otros comandos útiles:
+- `npm run db:down` → Apagar la base de datos
+- `npm run db:reset` → Borrar y volver a crear la base de datos
+- `npx prisma studio` → Abrir interfaz visual de la base de datos
+
+Este enfoque es actualmente el más práctico para desarrollo diario.
+
 ### Supabase Self-Hosted (Futuro - Opcional)
 
-Si más adelante quieres tener todo en Docker (Supabase + tu app), podemos agregar los servicios oficiales de Supabase (Postgres + Auth + Storage) al compose. Por ahora se recomienda **Supabase Cloud**.
+Si más adelante quieres tener **todo** (Next.js + Auth + Base de datos) dentro de Docker, podemos montar el stack completo de Supabase self-hosted. Por ahora se recomienda el modo híbrido.
 
 ## 📦 Scripts (Docker)
 

@@ -1,0 +1,39 @@
+# =====================================================
+# Docker Compose - Solo Base de Datos (PostgreSQL)
+# =====================================================
+#
+# Este archivo levanta SOLO PostgreSQL.
+# Úsalo cuando quieras trabajar con Next.js localmente (npm run dev)
+# y tener la base de datos dentro de Docker.
+#
+# Comandos recomendados:
+#   docker compose -f docker-compose.db.yml up -d     → Levantar BD
+#   docker compose -f docker-compose.db.yml down      → Apagar BD
+#
+# La aplicación Next.js NO se levanta aquí.
+# =====================================================
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: barberflow-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: barberflow
+      POSTGRES_PASSWORD: barberflow123
+      POSTGRES_DB: barberflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - barberflow_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U barberflow -d barberflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  barberflow_pg_data:
+    driver: local
