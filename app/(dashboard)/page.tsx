@@ -3,22 +3,33 @@ import { createClient } from '@/lib/supabase/server'
 export default async function DashboardPage() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let userEmail = 'barbero'
+  let userRole = 'sin asignar'
 
-  // Intentamos leer el perfil (si ya existe)
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name, role')
-    .eq('id', user?.id)
-    .single()
+  // Solo intentamos leer datos de Supabase si está configurado
+  if (supabase) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (user) {
+      userEmail = user.email?.split('@')[0] || 'barbero'
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, role')
+        .eq('id', user.id)
+        .single()
+
+      if (profile?.role) userRole = profile.role
+    }
+  }
 
   return (
     <div>
       <h1 className="text-4xl font-semibold tracking-tight mb-2">Dashboard</h1>
       <p className="text-white/60 mb-8">
-        Bienvenido, {profile?.full_name || user?.email?.split('@')[0] || 'barbero'}.
+        Bienvenido, {userEmail}.
       </p>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -39,8 +50,9 @@ export default async function DashboardPage() {
       </div>
 
       <div className="mt-10 text-xs text-white/30">
-        Rol actual: <span className="text-amber-400">{profile?.role || 'sin asignar'}</span> · 
-        (Próximamente: control de acceso por rol)
+        Modo actual: <span className="text-amber-400">Híbrido (Prisma local)</span> · 
+        Rol: {userRole} · 
+        (Datos de ejemplo - Sprint 2)
       </div>
     </div>
   )
