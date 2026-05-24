@@ -61,3 +61,14 @@ model Client {
   updatedAt DateTime @updatedAt
 }
 
+model Barber {
+  id            String   @id @default(cuid())
+  name          String
+  phone         String?
+  specialties   String[] // ej: ["Corte", "Barba", "Fade", "Tinte"]
+  color         String   @default("#f59e0b") // color para mostrar en calendario
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+

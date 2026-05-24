@@ -5,6 +5,24 @@ import { ReactNode } from 'react'
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient()
 
+  // Modo híbrido: sin Supabase configurado → permitimos acceso temporalmente (para desarrollo con Prisma)
+  if (!supabase) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] text-white">
+        <header className="border-b border-white/10 bg-black/40">
+          <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="font-semibold tracking-tight">BarberFlow</span>
+              <span className="text-xs px-2 py-0.5 rounded bg-amber-400/20 text-amber-400">Modo Híbrido</span>
+            </div>
+            <span className="text-xs text-white/50">Sin autenticación (Prisma local)</span>
+          </div>
+        </header>
+        <main className="max-w-7xl mx-auto px-6 py-8">{children}</main>
+      </div>
+    )
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -13,12 +31,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     redirect('/login')
   }
 
-  // Opcional: aquí podemos leer el perfil y pasar el rol vía context o props
-  // Por ahora solo protegemos el acceso
-
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Navbar simple del dashboard */}
       <header className="border-b border-white/10 bg-black/40 backdrop-blur">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
