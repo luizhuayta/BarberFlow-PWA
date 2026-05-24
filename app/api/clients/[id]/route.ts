@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { clientSchema } from '@/lib/validations/client'
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -16,17 +17,29 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const body = await request.json()
+
+    const validation = clientSchema.safeParse(body)
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Datos inválidos', details: validation.error.flatten() },
+        { status: 400 }
+      )
+    }
+
+    const data = validation.data
+
     const client = await prisma.client.update({
       where: { id: params.id },
       data: {
-        name: body.name,
-        phone: body.phone || null,
-        email: body.email || null,
-        notes: body.notes || null,
+        name: data.name,
+        phone: data.phone || null,
+        email: data.email || null,
+        notes: data.notes || null,
       },
     })
     return NextResponse.json(client)
   } catch (error) {
+    console.error('Error al actualizar cliente:', error)
     return NextResponse.json({ error: 'Error al actualizar' }, { status: 500 })
   }
 }

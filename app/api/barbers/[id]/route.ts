@@ -1,23 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { barberSchema } from '@/lib/validations/barber'
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const body = await request.json()
 
+    const validation = barberSchema.safeParse(body)
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Datos inválidos', details: validation.error.flatten() },
+        { status: 400 }
+      )
+    }
+
+    const data = validation.data
+
     const barber = await prisma.barber.update({
       where: { id: params.id },
       data: {
-        name: body.name,
-        phone: body.phone || null,
-        specialties: body.specialties || [],
-        color: body.color || '#f59e0b',
-        isActive: body.isActive,
+        name: data.name,
+        phone: data.phone || null,
+        specialties: data.specialties,
+        color: data.color,
+        isActive: data.isActive,
       },
     })
 
     return NextResponse.json(barber)
   } catch (error) {
+    console.error('Error al actualizar barbero:', error)
     return NextResponse.json({ error: 'Error al actualizar barbero' }, { status: 500 })
   }
 }
