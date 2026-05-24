@@ -47,8 +47,16 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Rutas protegidas (agrega más según avances)
-  const protectedRoutes = ['/dashboard', '/citas', '/clientes', '/ventas', '/reportes']
+  // Rutas protegidas (actualizado - Sprint 2)
+  const protectedRoutes = [
+    '/dashboard',
+    '/servicios',
+    '/barberos',
+    '/clientes',
+    '/citas',
+    '/ventas',
+    '/reportes',
+  ]
 
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)

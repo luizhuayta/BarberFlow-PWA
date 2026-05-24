@@ -30,3 +30,15 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     return NextResponse.json({ error: 'Error al actualizar' }, { status: 500 })
   }
 }
+
+// DELETE - Eliminar cliente
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    await prisma.client.delete({
+      where: { id: params.id },
+    })
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    return NextResponse.json({ error: 'Error al eliminar cliente' }, { status: 500 })
+  }
+}
